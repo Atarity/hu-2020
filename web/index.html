@@ -7,21 +7,89 @@
     
     <title></title>
 
+    <script src="https://kit.fontawesome.com/12035ce634.js" crossorigi n="anonymous"></script>
+
     <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
 
+    <link rel="stylesheet" id="style" href="assets/css/animate.css" type="text/css" media="all">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=0.60" />
+
+
 </head>
 
 
 <body>
+
+    <section class="screen btn-list active" data-name="main">
+            
+        <ul></ul>
+
+    </section>
+
+    <section class="screen btn-form" data-name="config">
+
+        <span class="back"><i class="fas fa-arrow-left"></i></span>
+         
+        <form>
+
+            <label>
+                Название
+                <input type="text" name="name" />
+            </label>
+
+            <label>
+                Прошивка
+                <input type="text" readonly />
+            </label>
+
+            <label>
+                Уровень зряда батареи
+                <input type="text" readonly />
+            </label>
+
+            <label class="coord">
+                Геопозиция
+                <div>
+                    <input type="text" name="lat" placeholder="Latitude" />
+                    <input type="text" name="lng" placeholder="Longitude" />
+                    <span class="coord-picker"><i class="fas fa-map-marker-alt"></i></span>
+                </div>
+            </label>
+
+            <label>
+                Шаблон
+                <select>
+                    <option value="link">Ссылка</option>
+                </select>
+            </label>
+
+            <label>
+                Ссылка
+                <input type="text" name="url"/>
+            </label>
+
+            <button><i class="fas fa-check"></i> ОК</button>
+
+        </form>
+
+    </section>
     
+    <section class="screen map" data-name="map">
+
+        <span class="back"><i class="fas fa-arrow-left"></i></span>
+
+        <div id="map"></div>
+
+    </section>
     
 </body>
 
 
-<script type="text/javascript" src='assets/app.js'></script>
+<script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src='assets/js/app.js?v=0.60'></script>
 
 </html>
