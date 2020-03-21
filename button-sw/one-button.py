@@ -1,3 +1,5 @@
+import random
+
 import paho.mqtt.client as paho
 import argparse
 import logging
@@ -14,7 +16,6 @@ logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 HOST = "sandbox.rightech.io"
 PORT = 1883
-CLIENT_ID = "mqtt-hu2020_03-mlq1gs"
 ONE_BUTT_CONFIGURE_SET = "one-butt/configure/set"
 ONE_BUTT_DISPLAY_SET = "one-butt/display/set"
 
@@ -30,26 +31,44 @@ def on_message(client, userdata, msg):
         configuration = json.loads(msg.payload)
 
 
-client = paho.Client(CLIENT_ID)
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(HOST, PORT)
-client.subscribe(ONE_BUTT_CONFIGURE_SET)
-client.subscribe(ONE_BUTT_DISPLAY_SET)
-client.loop_start()
+def get_battery_level():
+    return 85
 
-LOGGER.info("loop started")
-temperature = 36.6
-try:
-    while True:
-        temperature += 0.1
-        (rc, mid) = client.publish("one-butt/event/new-pin", str(temperature), qos=1)
-        if configuration:
-            (rc, mid) = client.publish("pos.lat", configuration["latitude"])
-            (rc, mid) = client.publish("pos.lon", configuration["longitude"])
-        LOGGER.info("new pin generated: %s" % (str(temperature)))
-        time.sleep(5)
-finally:
-    client.loop_stop()
-    LOGGER.info("loop stopped")
+
+def generate_pin():
+
+    return "asomepin" + str(int(random.random()*10000))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='One-butt worker.')
+    parser.add_argument("--id", type=str, help="client_id of the device")
+    args = parser.parse_args()
+
+    random.seed()
+    client = paho.Client(args.id)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(HOST, PORT)
+    client.subscribe(ONE_BUTT_CONFIGURE_SET)
+    client.subscribe(ONE_BUTT_DISPLAY_SET)
+    client.loop_start()
+
+    LOGGER.info("loop started")
+    temperature = 36.6
+    try:
+        while True:
+            pin = generate_pin()
+            (rc, mid) = client.publish("one-butt/event/new-pin", pin, qos=1)
+            LOGGER.debug("one-butt/event/new-pin: %s, %s" % (str(rc), str(mid)))
+            (rc, mid) = client.publish("one-butt/state/bat-charge", get_battery_level())
+            LOGGER.debug("one-butt/state/bat-charge: %s, %s" % (str(rc), str(mid)))
+            if configuration:
+                (rc, mid) = client.publish("pos.lat", configuration["latitude"])
+                (rc, mid) = client.publish("pos.lon", configuration["longitude"])
+            LOGGER.info("new pin generated: %s" % pin)
+            time.sleep(5)
+    finally:
+        client.loop_stop()
+        LOGGER.info("loop stopped")
 
