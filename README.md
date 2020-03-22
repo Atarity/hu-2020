@@ -1,1 +1,3 @@
-# hu-2020
+# Hack University 2020 event artifacts
+
+One button to rule them all.
