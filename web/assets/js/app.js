@@ -188,6 +188,15 @@ var app = {
                 $('input[name*="long"]', wrap).val(obj.state.long);
             }
             
+            var urlTpl = "";
+            if (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("url-template")) {
+                urlTpl = obj.state["url-template"];
+            }
+
+            $('select[name*="url"]')
+            .val(urlTpl)
+            .trigger('change');
+
             app.ui.screen("config");
 
         },
@@ -229,10 +238,6 @@ var app = {
         lng: 'ru-RU',        
         center: { lng: 53.2323987, lat: 56.8618626},
         inited: false,
-
-        icons: {
-            main: new H.map.Icon('<svg width="80" height="25" xmlns="http://www.w3.org/2000/svg"><rect stroke="white" fill="#1b468d" x="1" y="1" width="80" height="25" /><text x="40" y="18" font-size="12pt" font-family="Arial" font-weight="bold" text-anchor="middle" fill="white">кнопка ●</text></svg>')
-        },
 
         init: function(el) {
 
@@ -294,8 +299,8 @@ var app = {
                     if (target && target.hasOwnProperty("b") && target.b.hasOwnProperty("lat")) {
 
                         var wrap = $('.btn-form');
-                        $('input[name*="lat"]', wrap).val(target.b.lat.toFixed(3));
-                        $('input[name*="long"]', wrap).val(target.b.lng.toFixed(3));
+                        $('input[name*="latitude"]', wrap).val(target.b.lat.toFixed(3));
+                        $('input[name*="longitude"]', wrap).val(target.b.lng.toFixed(3));
 
                     }
 
@@ -364,7 +369,6 @@ var app = {
     }
 
 }
-
 
 $(document).ready(function() {  app.init(); });
 
