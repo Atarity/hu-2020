@@ -9,10 +9,14 @@ var app = {
 
     ui: {
 
+        currentScreen: null,
+
         screen: function(name) {
 
             $('.screen').hide();
             $('.screen[data-name="'+name+'"]').fadeIn();
+
+            this.currentScreen = name;
 
         },
 
@@ -29,32 +33,90 @@ var app = {
 
                 });
 
+                return false;
+
             });
 
             $('span.back').click(function() {
 
-                app.ui.screen("main");
+                if (app.ui.currentScreen == "map") {
+                    app.ui.screen("config");
+                } else {
+                    app.ui.screen("main");
+                }
 
             });
 
             $('.coord-picker').click(function() {
 
-                app.ui.screen("map");
+                app.map.clear();
+                
+                var coords = {};
 
-                if (!app.map.inited) {
+                var wrap   = $('.btn-form');
+                coords.lat = $('input[name*="lat"]', wrap).val();
+                coords.lng = $('input[name*="long"]', wrap).val();
 
-                    $('#map').css({
-                        width: $(window).width() + "px",
-                        height: $(window).height() + "px",
+                if (coords.lat && coords.lng) {
+
+                    app.map.marker(coords, true);
+                    app.map.obj.setCenter(coords);
+
+                } else {
+
+
+                    app.map.geolocation(function(coord) {
+
+                        var coords = {
+                            lat: coord.latitude, 
+                            lng: coord.longitude
+                        };
+
+                        app.map.marker(coords, true);
+                        app.map.obj.setCenter(coords);
+
                     });
 
-                    app.map.inited = true;
-                    app.map.init($('#map')[0]);
+                }
+
+                app.ui.screen("map");
+                app.map.obj.getViewPort().resize();
+
+            });
+
+            $('.btn-form select').change(function() {
+
+                var url = $('.btn-form input[name="urlCustom"]').parent();
+                if ($(this).val() == "") {
+
+                    $(url).show();
+
+                } else {
+
+                    $(url).hide();
+
                 }
 
             });
 
-            
+            $('#map').css({
+                width: $(window).width() + "px",
+                height: $(window).height() + "px",
+            });
+
+            setTimeout(function() {
+
+                $('.logo span:eq(0)').text('K');
+                $('.logo span:eq(1)').text('N');
+                $('.logo span:eq(2)').text('PK');
+                $('.logo span:eq(3)').text('🔵');
+
+                $('.logo').addClass('animated rubberBand');
+
+            }, 1500);
+
+            app.map.init($('#map')[0]);
+
         },
 
     },
@@ -76,10 +138,15 @@ var app = {
 
                 for(n in data) {
 
-                    var obj = data[n];
-                    $(ul).append('<li class="animated fadeInLeft" data-battery="100%" data-status="online" data-n="'+n+'" data-id="'+obj._id+'"><span>' + obj.name + '</span></li>');  
+                    var obj     = data[n];
+                    var battery = parseInt( (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("bat-charge")) ? obj.state['bat-charge'] : 0);
+                    var status  = battery ? "online" : "offline";
+
+                    $(ul).append('<li data-battery="'+battery+'" data-status="'+status+'" data-n="'+n+'" data-id="'+obj._id+'"><span>' + obj.name + '</span></li>');  
 
                 }
+
+                $(ul).addClass('animated slideInDown');
 
                 $(ul).find('li').click(function() {
 
@@ -98,23 +165,31 @@ var app = {
 
             app.btn.currentId = obj._id;
 
-            var wrap = $('.btn-form');
+            var wrap    = $('.btn-form');
+            var battery = parseInt( (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("bat-charge")) ? obj.state['bat-charge'] : 0);
 
             $('input[name="name"]', wrap).val(obj.name);
+            $('.battery input', wrap).val(battery + '%');
+            $('.battery span', wrap).css({width: battery + '%'});
 
+            if (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("lat")) {
+                $('input[name*="lat"]', wrap).val(obj.state.lat);
+            }
+
+            if (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("long")) {
+                $('input[name*="long"]', wrap).val(obj.state.long);
+            }
+            
             app.ui.screen("config");
 
         },
 
-        config: function(id, data) {
+        config: function(id, data, callback) {
 
             console.log('btn config, id ' + id);
+            console.log(data);
 
-            app.api.query('objects/'+id, data, function(data) {
-
-                console.log(data);
-
-            }); 
+            app.api.query('objects/'+id, data, callback); 
 
         },
 
@@ -142,24 +217,99 @@ var app = {
             this.obj = new H.Map(el,
             this.defaultLayers.vector.normal.map,
             {
-                zoom: 15,
-                center: this.center
+                zoom: 12,
+                center: this.center,
+                pixelRatio: window.devicePixelRatio || 1
             });
 
-            this.ui = H.ui.UI.createDefault(this.obj, this.defaultLayers, this.lng);
+            window.addEventListener('resize', () => this.obj.getViewPort().resize());
+
+            this.behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(this.obj));
+            this.ui       = H.ui.UI.createDefault(this.obj, this.defaultLayers, this.lng);
 
         },
 
-        marker: function(coords, icon) {
+        marker: function(coords, draggable) {
 
+            console.log('marker add');
             console.log(coords);
 
-            icon   = icon || {icon: this.icons.main};
-            marker = new H.map.Marker(coords, icon);
+            draggable = draggable || false;
+
+            marker = new H.map.Marker(coords, {
+                volatility: true
+            });
+
+            if (draggable) {
+
+                marker.draggable = true;
+                behavior = app.map.behavior;
+
+                app.map.obj.addEventListener('dragstart', function(ev) {
+                    var target = ev.target,
+                        pointer = ev.currentPointer;
+                    if (target instanceof H.map.Marker) {
+                      var targetPosition = app.map.obj.geoToScreen(target.getGeometry());
+                      target['offset'] = new H.math.Point(pointer.viewportX - targetPosition.x, pointer.viewportY - targetPosition.y);
+                      behavior.disable();
+                    }
+                }, false);
+
+
+                app.map.obj.addEventListener('dragend', function(ev) {
+                    
+                    var target = ev.target;
+                    if (target instanceof H.map.Marker) {
+                      behavior.enable();
+                    }
+
+                    if (target && target.hasOwnProperty("b") && target.b.hasOwnProperty("lat")) {
+
+                        var wrap = $('.btn-form');
+                        $('input[name*="lat"]', wrap).val(target.b.lat.toFixed(3));
+                        $('input[name*="long"]', wrap).val(target.b.lng.toFixed(3));
+
+                    }
+
+                }, false);
+
+                app.map.obj.addEventListener('drag', function(ev) {
+                    var target = ev.target,
+                        pointer = ev.currentPointer;
+                    if (target instanceof H.map.Marker) {
+                      target.setGeometry(app.map.obj.screenToGeo(pointer.viewportX - target['offset'].x, pointer.viewportY - target['offset'].y));
+                    }
+                }, false);
+
+            }
 
             this.obj.addObject(marker);
 
         },
+
+        clear: function() {
+            app.map.obj.removeObjects( app.map.obj.getObjects());
+        },
+
+        geolocation: function(callback) {
+
+            console.log("navigator.geolocation");
+
+            if(navigator.geolocation) {
+                
+                navigator.geolocation.getCurrentPosition(position => {
+                        
+                    callback.call(this, position.coords);
+
+                });
+
+            } else {
+                
+
+
+            }
+
+        }
 
     },
 

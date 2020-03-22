@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+    <title>Электронная очередь</title>
+
+    <style>
+
+        body {
+            color: #FFF;
+            background: #61B4F0;
+            font-family: sans-serif;
+            padding: 30px;
+        }
+
+        h3, h4, h5 {
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+
+        h5 {
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        ul li {
+            padding: 20px;
+            border: 1px solid;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            position: relative;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        ul li.active:before {
+            content: '☑';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            font-size: 3em;
+            margin-right: 10px;
+        }
+
+        button {
+            color: #FFF;
+            background: #61B4F0;
+            padding: 20px;
+            border: 3px solid;
+            width: 100%;
+            font-size: 2em;
+            margin-top: 30px;
+        }
+
+        p {
+            font-size: 3em;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+        }
+
+
+        table th,
+        table td {
+            border: 1px solid;
+            padding: 10px;
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <section>
+        <h3>Электронная очередь</h3>
+
+        <h4>Ваш пин: <span>23443</span></h4>
+            
+        <ul>
+            <li class="active">Услуга 1</li>
+            <li>Услуга 2</li>
+            <li>Услуга 3</li>
+        </ul>
+
+        <button class="init">Подтвердить</button>
+    </section>
+
+    <section style="display: none;">
+        <p>Номер клиента <strong>32</strong>, пожалуйста ожидайте приглашения!</p>
+    </section>
+
+    <section style="display: none;">
+        
+        <table>
+            <tr>
+                <th>Клиент</th>
+                <th>Окно</th>
+            </tr>
+            <tr>
+                <td>27</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>28</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>32</td>
+                <td>-</td>
+            </tr>
+        </table>
+
+        <button class="cancel">Отменить запись</button>
+
+    </section>
+
+</body>
+
+<script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+
+<script type="text/javascript">
+    
+    $(document).ready(function() {
+
+        $('ul li').click(function() {
+
+            $('ul li').removeClass('active');
+            $(this).addClass('active');
+
+        });
+
+        $('button.init').click(function(){
+
+            $('section:eq(0)').hide();
+            $('section:eq(1)').show();
+
+            setTimeout(function() {
+
+                $('section:eq(1)').hide();
+                $('section:eq(2)').show();
+
+            }, 3000);
+
+        });
+
+        $('button.cancel').click(function(){
+
+            $('section').hide();
+            $('section:eq(0)').show();
+
+        });
+
+
+        var param = {}
+        location.search.substr(1).split("&").forEach(function(item) {param[item.split("=")[0]] = item.split("=")[1]})
+
+        if (param.hasOwnProperty("pin")) {
+
+            // validate pin here
+
+            $('h4 span').text(param.pin);
+
+        }
+
+    });
+
+</script>
+
+</html>

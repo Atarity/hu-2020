@@ -21,7 +21,9 @@ if ($endpoint) {
 
     if ($data) {
 
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        $type = strpos($url, "/commands/")!== false ? "POST" : "PATCH";
+
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
     }
