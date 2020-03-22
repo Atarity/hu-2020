@@ -124,6 +124,7 @@ var app = {
     btn: {
 
         currentId: null,
+        currentModel: null,
 
         get: function() {
 
@@ -141,6 +142,12 @@ var app = {
                     var obj     = data[n];
                     var battery = parseInt( (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("bat-charge")) ? obj.state['bat-charge'] : 0);
                     var status  = battery ? "online" : "offline";
+
+                    if (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("online")) {
+
+                        status  = obj.state.online ? "online" : "offline";
+
+                    }
 
                     $(ul).append('<li data-battery="'+battery+'" data-status="'+status+'" data-n="'+n+'" data-id="'+obj._id+'"><span>' + obj.name + '</span></li>');  
 
@@ -163,7 +170,8 @@ var app = {
 
         show: function(obj) {
 
-            app.btn.currentId = obj._id;
+            app.btn.currentId    = obj._id;
+            app.btn.currentModel = obj.model;
 
             var wrap    = $('.btn-form');
             var battery = parseInt( (obj.hasOwnProperty("state") && obj.state.hasOwnProperty("bat-charge")) ? obj.state['bat-charge'] : 0);
@@ -189,7 +197,27 @@ var app = {
             console.log('btn config, id ' + id);
             console.log(data);
 
+            var params    = data.params;
+            var urlCustom = data.urlCustom;
+
+            if (params.payload.url == "") {
+                params.payload.url = urlCustom;
+            }
+
+            var payload = JSON.stringify(params.payload);
+
+            delete data.params;
+            delete data.urlCustom;
+
+
             app.api.query('objects/'+id, data, callback); 
+            app.api.query('models/'+app.btn.currentModel+'/nodes/configure', {
+                params: {payload: payload}
+            }, function() {
+
+                app.api.query('objects/'+id+'/commands/configure', {"url": ""});
+
+            }); 
 
         },
 

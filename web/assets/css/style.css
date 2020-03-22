@@ -189,18 +189,18 @@ section.screen.active {
     display: flex;
 }
 
-.btn-form input[name="lat"],
-.btn-form input[name="long"] {
+.btn-form input.lat,
+.btn-form input.lng {
     width: 50%;
     box-sizing: border-box;
     flex: 1;
 }
 
-.btn-form input[name="lat"] {
+.btn-form input.lat {
     margin-right: 5px;
 }
 
-.btn-form input[name="long"] {
+.btn-form input.lng {
     margin-right: 5px;
 }
 

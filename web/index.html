@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
 
     <link rel="stylesheet" id="style" href="assets/css/animate.css" type="text/css" media="all">
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=0.114" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=0.151" />
 
 
 </head>
@@ -62,15 +62,15 @@
             <label class="coord">
                 Местоположение
                 <div>
-                    <input type="text" name="lat" placeholder="Latitude" />
-                    <input type="text" name="long" placeholder="Longitude" />
+                    <input type="text" class="lat" name="params[payload][latitude]" placeholder="Latitude" />
+                    <input type="text" class="lng" name="params[payload][longitude]" placeholder="Longitude" />
                     <span class="coord-picker"><i class="fas fa-map-marker-alt"></i></span>
                 </div>
             </label>
 
             <label>
                 Шаблон
-                <select name="url">
+                <select name="params[payload][url]">
                     <option value="">Ссылка</option>
                     <option value="https://bluntcaster.com/hackuniversity/web/tpl_queue.html">Электронная очередь</option>
                     <option value="https://bluntcaster.com/hackuniversity/web/tpl_event.html">Регистрация на мероприятие</option>
@@ -100,6 +100,6 @@
 
 
 <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
-<script type="text/javascript" src='assets/js/app.js?v=0.138'></script>
+<script type="text/javascript" src='assets/js/app.js?v=0.150'></script>
 
 </html>
