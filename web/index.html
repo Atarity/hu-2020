@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
 
     <link rel="stylesheet" id="style" href="assets/css/animate.css" type="text/css" media="all">
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=0.60" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=0.154" />
 
 
 </head>
@@ -25,8 +25,18 @@
 <body>
 
     <section class="screen btn-list active" data-name="main">
+
+        <div class="logo">
+            <span>N</span><span>K</span><span>PK</span> <span class="animated slideInRight">🦀</span>
+        </div>
             
         <ul></ul>
+
+        <div class="poweredby">
+            <img src="https://static.tildacdn.com/tild6635-3263-4034-b437-623639383730/hu.png" />
+            <img src="https://rightech.io/wp-content/themes/rightech/dist/img/logo-white.svg" />
+            <img src="https://static.tildacdn.com/tild6537-3533-4030-b336-323736613933/HERE_logo_white_200p.png" />
+        </div>
 
     </section>
 
@@ -34,7 +44,7 @@
 
         <span class="back"><i class="fas fa-arrow-left"></i></span>
          
-        <form>
+        <form method="POST">
 
             <label>
                 Название
@@ -42,35 +52,38 @@
             </label>
 
             <label>
-                Прошивка
-                <input type="text" readonly />
-            </label>
-
-            <label>
                 Уровень зряда батареи
-                <input type="text" readonly />
+                <div class="battery">
+                    <span style="width: 80%"></span>
+                    <input type="text" value="80%" readonly />
+                </div>
             </label>
 
             <label class="coord">
-                Геопозиция
+                Местоположение
                 <div>
-                    <input type="text" name="lat" placeholder="Latitude" />
-                    <input type="text" name="lng" placeholder="Longitude" />
+                    <input type="text" class="lat" name="params[payload][latitude]" placeholder="Latitude" />
+                    <input type="text" class="lng" name="params[payload][longitude]" placeholder="Longitude" />
                     <span class="coord-picker"><i class="fas fa-map-marker-alt"></i></span>
                 </div>
             </label>
 
             <label>
                 Шаблон
-                <select>
-                    <option value="link">Ссылка</option>
+                <select name="params[payload][url]">
+                    <option value="">Ссылка</option>
+                    <option value="https://bluntcaster.com/hackuniversity/web/tpl_queue.html">Электронная очередь</option>
+                    <option value="https://bluntcaster.com/hackuniversity/web/tpl_queue.html">Регистрация на мероприятие</option>
                 </select>
             </label>
 
             <label>
                 Ссылка
-                <input type="text" name="url"/>
+                <input type="text" name="urlCustom"/>
             </label>
+
+            <div class="statistic">Выполнено нажатий <span>234</span></div>
+            <div class="statistic">Целевых действий <span>114</span></div>
 
             <button><i class="fas fa-check"></i> ОК</button>
 
@@ -90,6 +103,6 @@
 
 
 <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
-<script type="text/javascript" src='assets/js/app.js?v=0.60'></script>
+<script type="text/javascript" src='assets/js/app.js?v=0.159'></script>
 
 </html>

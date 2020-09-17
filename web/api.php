@@ -8,25 +8,54 @@ $data     = $_REQUEST['data'];
 $server   = 'https://sandbox.rightech.io/api/v1/';
 $url      = "$server$endpoint";
 
+$debug    = false;
+
 if ($endpoint) {
 
     $ch = curl_init(); 
     curl_setopt($ch, CURLOPT_URL, $url);  
     curl_setopt($ch, CURLOPT_HEADER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    
+    $headers = array(
         'Content-Type: application/json', 
         "Authorization: Bearer " . TOKEN
-    ));
+    );
 
-    if ($data) {
+    if ($debug) {
 
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+
+        $verbose = fopen('php://temp', 'w+');
+        curl_setopt($ch, CURLOPT_STDERR, $verbose);
 
     }
 
+
+    if ($data) {
+
+        $type = strpos($url, "/commands/")!== false ? "POST" : "PATCH";
+        $json = json_encode($data);
+
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+        $headers[] = "Content-Length: " . strlen($json);
+
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
     echo curl_exec($ch); 
+
+    if ($debug) {
+
+        rewind($verbose);
+        $verboseLog = stream_get_contents($verbose);
+
+        echo htmlspecialchars($verboseLog);
+
+    }
 
 }
 ?>
